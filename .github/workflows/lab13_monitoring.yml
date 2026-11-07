@@ -1,0 +1,42 @@
+name: Lab 13 - End-to-End MLOps
+# Integration test: process a genuinely new incoming batch.
+# Project folder: set a repository variable CHURN_PROJECT_DIR (Settings > Variables);
+# otherwise the checked-out workspace is used.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+      timezone: "Asia/Kolkata"
+
+jobs:
+  mlops-monitoring:
+    runs-on: [self-hosted, Windows, X64]
+    env:
+      PROJECT_DIR: ${{ vars.CHURN_PROJECT_DIR || github.workspace }}
+
+    steps:
+      - name: Run MLOps monitoring trigger
+        shell: powershell
+        run: |
+          Set-Location $env:PROJECT_DIR
+          $py = if (Test-Path ".\venv\Scripts\python.exe") { ".\venv\Scripts\python.exe" }
+                elseif (Test-Path ".\.venv\Scripts\python.exe") { ".\.venv\Scripts\python.exe" }
+                else { "python" }
+          & $py ".\src\mlops_pipeline\12_monitor_trigger.py"
+
+      - name: Show monitoring result
+        shell: powershell
+        run: |
+          Set-Location $env:PROJECT_DIR
+          if (Test-Path ".\outputs\monitoring\monitor_trigger_report.json") {
+              Get-Content ".\outputs\monitoring\monitor_trigger_report.json"
+          } else {
+              Write-Host "Monitoring report was not generated."
+          }
+
+      - name: Verify Kubernetes
+        shell: powershell
+        run: |
+          kubectl get deployment churn-api
+          kubectl get pods

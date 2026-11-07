@@ -1,0 +1,60 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pipeline: full run (force, no Docker)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/mlops_pipeline/churn_prediction_pipeline.py",
+      "args": ["--force", "--skip-deploy"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pipeline: normal run (stops if no new data)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/mlops_pipeline/churn_prediction_pipeline.py",
+      "args": ["--skip-deploy"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Monitoring: drift check + retrain trigger",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/mlops_pipeline/12_monitor_trigger.py",
+      "cwd": "${workspaceFolder}",
+      "env": { "SKIP_DEPLOY": "1" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "API: FastAPI (http://127.0.0.1:8000/docs)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["api.main:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "jinja": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "MLflow UI (http://127.0.0.1:5000)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "mlflow",
+      "args": ["ui", "--backend-store-uri", "sqlite:///mlflow.db", "--port", "5000"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: current file (project root as cwd)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}" },
+      "console": "integratedTerminal"
+    }
+  ]
+}

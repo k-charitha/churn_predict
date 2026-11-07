@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Setup: create venv + install", "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File setup.ps1", "problemMatcher": [] },
+    { "label": "Run pipeline (force, no Docker)", "type": "shell",
+      "command": "${command:python.interpreterPath} src/mlops_pipeline/churn_prediction_pipeline.py --force --skip-deploy",
+      "problemMatcher": [] },
+    { "label": "Start API", "type": "shell",
+      "command": "${command:python.interpreterPath} -m uvicorn api.main:app --reload --port 8000",
+      "isBackground": true, "problemMatcher": [] },
+    { "label": "Run tests", "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest", "group": "test", "problemMatcher": [] }
+  ]
+}
